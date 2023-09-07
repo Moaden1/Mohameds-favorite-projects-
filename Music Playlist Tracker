@@ -1,0 +1,183 @@
+// Mohamed Aden
+// CSE 122
+// July 9th, 2023
+// Atharva Kashyap
+// This program prompts the user for input based on a menu with several options
+// with these options this allows user to create a playlist. The user can also 
+// play songs which are then added/tracked to the song history. This history 
+// can be shown to the user as well as cleared w/the ability to even clear 
+// specific songs from the history.
+import java.util.*;
+import java.io.*;
+
+public class MusicPlaylist {
+    public static void main(String[] args) {
+        Scanner console = new Scanner(System.in);
+        Queue<String> musicQueue = new LinkedList<>();
+        Stack<String> musicHistory = new Stack<>();
+        System.out.print("Welcome to the CSE 122 Music Playlist!");
+        String select = menuMessage(console);
+        while (!select.equalsIgnoreCase("Q")) {
+            if (select.equalsIgnoreCase("A")) {
+                addSong(console, musicQueue);
+            } else if (select.equalsIgnoreCase("P")){
+                playSong(musicQueue, musicHistory);
+            } else if (select.equalsIgnoreCase("Pr")){
+                printHistory(musicHistory);
+            } else if (select.equalsIgnoreCase("C")){
+                musicHistory.clear();
+            } else if (select.equalsIgnoreCase("D")) {
+                deleteHistory(console, musicHistory);
+            }
+            select = menuMessage(console);
+       }
+    }
+
+    // This method takes a Scanner console and returns the user input, 
+    // which is used to go into other methods in this program depending on their input.
+    // This method prints a message which is directed towards the user. The user 
+    // is prompted for a choice and depending on the choice, the user can add a song 
+    // to a playlist, play a song from that playlist, show/print the history based on 
+    // songs played, clear or delete specific songs from the history (all done outside 
+    // the scope of this particular method).
+    // Parameters: 
+    //  Scanner console -- used to prompt user for input, which is then used back in 
+    //  the main method
+    // Returns:
+    //  N/A
+    public static String menuMessage (Scanner console) {
+        System.out.println();
+        System.out.println("(A) Add song");
+        System.out.println("(P) Play song");
+        System.out.println("(Pr) Print history");
+        System.out.println("(C) Clear history");
+        System.out.println("(D) Delete from history");
+        System.out.println("(Q) Quit");
+        System.out.println();
+        System.out.print("Enter your choice: ");
+        return console.nextLine();
+    }
+
+    // This method takes a Scanner and an empty queue ready to be modified. The method
+    // prints a message prompting the user to enter a song name. This method takes take 
+    // user input and adds it to a queue where it waits to be played. Once added, 
+    // the method lets the user know by printing "Successfully added" as well as the 
+    // song name to let user know what song specifically has been added 
+    // Parameters: 
+    //  Scanner console -- used to prompt user for song name to be added to queue
+    //  Queue<String> musicQueue -- used to; create playlist/store song names to be played
+    // Returns:
+    //  N/A
+    public static void addSong(Scanner console, Queue<String> musicQueue) {
+        System.out.print("Enter song name: ");
+        String songName = console.nextLine();
+        musicQueue.add(songName);
+        System.out.println("Successfully added " + songName);
+        System.out.println();
+    }
+
+    // This method takes a Queue and an empty Stack. In the case the queue 
+    // is empty, an IllegalStateException is thrown. This removes a song/element 
+    // from the musicQueue Parameters and prints a message showing what song is 
+    // played. This element removed is then added into the empty stack to represent the song history
+    // Parameters: 
+    //  Queue<String> musicQueue -- Removing songs(elements) from this queue to be printed & 
+    //  added elsewhere
+    //  Stack<String> musicHistory -- used to add removed songs/elements from the queue to 
+    //  now represent song history. 
+    // Returns:
+    //  N/A
+    public static void playSong (Queue<String> musicQueue, Stack<String> musicHistory) {
+        if (musicQueue.isEmpty()) {
+            throw new IllegalStateException();
+        }
+        String removed = musicQueue.remove();
+        System.out.println("Playing song: " + removed);
+        musicHistory.push(removed);
+        System.out.println();
+    }
+
+    // This method takes the song history stored in a Stack as a Parameter and prints the 
+    // contents of the stack representing song history. In the case that the stack is 
+    // empty when this method is called, an IllegalStateException is thrown to let user 
+    // know history cannot be printed if the Stack parameter passed is empty (no songs in history).
+    // Parameters: 
+    //  Stack<String> musicHistory -- used to print it's contents, allowing user to know what 
+    //  songs remain in song history
+    // Returns:
+    //  N/A
+    public static void printHistory (Stack<String> musicHistory) {
+        if (musicHistory.isEmpty()) {
+            throw new IllegalStateException();
+        }
+        Stack<String> aux = new Stack<>();
+        while (!musicHistory.isEmpty()) {
+            String retrieve = musicHistory.pop();
+            System.out.println("    " + retrieve);
+            aux.push(retrieve);
+        }
+        while (!aux.isEmpty()) {
+            musicHistory.push(aux.pop());
+        }
+    }
+
+    // This method deletes songs from the song history. The method prompts the user 
+    // for a number, "n". If negative, we delete from songs furthest back in the 
+    // history (songs added into the history earilier than others), and if positive, 
+    // we delete from the most recent songs in the history. Regardless of whether + or - 
+    // we will delete n songs from the history and will also return the contents the same, 
+    // just with the removed elements not being included. In case where the absolute value 
+    // of the number entered by user is greater than the size of the Stack representing the 
+    // music history, an IllegalArgumentException is thrown. (ex. if musicHistory.size() = 2 
+    // and the number entered by user is -3, the exception will be thrown, b/c absolute value 
+    // of -3 is greater than 2). 
+    // Parameters:
+    //  Scanner console -- used to prompt user for number which is then used to delete songs based on # input
+    //  Stack<String> musicHistory -- This stack is deleted from based on user input. 
+    // Returns: 
+    //  n/a
+    public static void deleteHistory (Scanner console, Stack<String> musicHistory) {
+        System.out.println("A positive number will delete from recent history.");
+        System.out.println("A negative number will delete from the beginning of history.");
+        System.out.print("Enter number of songs to delete: ");
+        String input = console.nextLine();
+        int n = Integer.parseInt(input);
+        int value = Math.abs(n);
+        if (musicHistory.size() < value) {
+            throw new IllegalArgumentException();
+        }
+        Stack<String> aux = new Stack<>();
+        if (n < 0) {
+            sToS(musicHistory, aux);
+            popN(aux, value);
+            sToS(aux, musicHistory);
+        }
+        else {
+            popN(musicHistory, value);
+        }
+    }
+
+    // This method moves elements from one stack to another. 
+    // Parameters:
+    //  Stack<String> s1 -- stack being emptied into s2 stack
+    //  Stack<String> s2 -- stack being filled by s1 stack
+    // Returns: 
+    //  N/A
+    public static void sToS (Stack<String> s1, Stack<String> s2) {
+        while (!s1.isEmpty()) {
+            s2.push(s1.pop());
+        }
+    }
+
+    // This method takes a stack as a parameter and removes "n" elements.
+    // Parameters:
+    //  Stack<String> s -- stack that elements are being removed from
+    //  int n -- the number elements being removed from stack s
+    // Returns: 
+    //  N/A
+    public static void popN(Stack<String> s, int n) {
+        for (int i = 0; i < n; i++) {
+            s.pop();
+        }
+    }
+}
