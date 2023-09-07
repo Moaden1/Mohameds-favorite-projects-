@@ -1,0 +1,195 @@
+// Mohamed Aden
+// CSE 122
+// July 2nd, 2023
+// Atharva Kashyap
+// This program creates an ArrayList and prompts for user input 
+// The user can modify the list by calling a method to do something to the list
+// and can also create a file and print the contents of the list or take that file
+// and update the list with it's contents. User can also remove, add, 
+// ask to display the removed items. This program also prints the contents of 
+// the arrayList as the user adds or removes items.
+import java.util.*;
+import java.io.*;
+
+public class TodoListManager {
+
+    public static final boolean EXTENSION_FLAG = true;
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner input = new Scanner(System.in);
+        List<String> todos = new ArrayList<>();
+        List<String> completedTodos = new ArrayList<>();
+        System.out.println("Welcome to your TODO List Manager!");
+        System.out.println("What would you like to do?"); 
+        if (EXTENSION_FLAG) {
+            System.out.print("(A)dd TODO, (M)ark TODO as done, (L)oad TODOs," + 
+                                " (S)ave TODOs, (C)ompleted TODOs, (Q)uit? ");
+        } else {
+            System.out.print("(A)dd TODO, (M)ark TODO as done, (L)oad TODOs," + 
+                                                    " (S)ave TODOs, (Q)uit? ");
+        }
+        String select = input.nextLine();
+        while (!select.equalsIgnoreCase("Q")) {
+            if (select.equalsIgnoreCase("A")) {
+                addItem(input, todos);
+            } else if (select.equalsIgnoreCase("M")){
+                markItemAsDone(input, todos, completedTodos);
+            } else if (select.equalsIgnoreCase("L")){
+                loadItems(input, todos);
+            } else if (select.equalsIgnoreCase("S")){
+                saveItems(input, todos);
+            } else if (select.equalsIgnoreCase("C") && EXTENSION_FLAG) {
+                trueExtensionFlag(completedTodos);
+            } else {
+                System.out.println("Unknown input: " + select);
+            }
+            printTodos(todos);
+            System.out.println("What would you like to do?");
+            if (EXTENSION_FLAG) {
+                System.out.print("(A)dd TODO, (M)ark TODO as done, (L)oad TODOs," + 
+                                " (S)ave TODOs, (C)ompleted TODOs, (Q)uit? ");
+            } else {
+                System.out.print("(A)dd TODO, (M)ark TODO as done, (L)oad TODOs," + 
+                                                        " (S)ave TODOs, (Q)uit? ");
+            }
+            select = input.nextLine();
+       }
+    }
+
+    // This method prints the contents (if there are any, otherwise 
+    // user is notified they have no tasks) of the ArrayList 
+    // in a numbered list. 
+    // Parameters: 
+    //  List<String> todos -- empty ArrayList to be filled with user's tasks/todos
+    // Returns: 
+    //  N/A 
+    public static void printTodos(List<String> todos) {
+        System.out.println("Today's TODOs:");
+        if (todos.isEmpty()) {
+            System.out.println("  You have nothing to do yet today! Relax!");
+        } else {
+            for (int i = 0; i < todos.size(); i++) {
+                String current = todos.get(i);
+                System.out.println("  " + (i + 1) + ": " + current);
+            }
+        }
+    }
+
+    // This method adds prompts the user to add items to the list,
+    // and if there's already items in the list, prompts user where
+    // in the list they want to add. In case where user hits enter for
+    // the location of the item to be added, it will be added to the end of 
+    // the list automatically. 
+    // Parameters: 
+    //  Scanner input -- used to prompt user for task they'd like added 
+    //  and position of task in list
+    //  List<String> todos -- ArrayList to be updated w/user input
+    // Returns: 
+    //  N/A
+    public static void addItem(Scanner input, List<String> todos) {
+        if (todos.isEmpty()) {
+            System.out.print("What would you like to add? ");
+            String itemAdd = input.nextLine();
+            todos.add(itemAdd);
+        } else {
+            System.out.print("What would you like to add? ");
+            String itemAdd = input.nextLine();
+            System.out.print("Where in the list should it be (1-" + 
+                                (todos.size() + 1) + ")? (Enter for end): ");
+            String itemIndex = input.nextLine();
+            if (itemIndex.equals("")) {
+                todos.add(itemAdd);
+            } else { 
+                int num = Integer.parseInt(itemIndex);
+                todos.add(num - 1, itemAdd);
+            }
+        }
+    }
+
+    // This method, depending on if there's anything in the ArrayList, prompts
+    // the user for the item in the list they want to remove (or the task they 
+    // completed rather) and has an additional function, taking whatever they 
+    // remove and storing it in a seperate ArrayList.
+    // Parameters: 
+    //  Scanner input -- used to prompt user for item/task
+    // List<String> todos -- list being modified to remove specified tasks
+    // List<String> completedTodos -- list used to store removed tasks from todos ArrayList
+    // Returns: 
+    //  List<String> completedTodos -- used in trueExtensionFlag method to print it's contents
+    public static List<String> markItemAsDone(Scanner input, List<String> todos, 
+                                                        List<String> completedTodos) {
+        if (todos.isEmpty()) {
+            System.out.println("All done! Nothing left to mark as done!");
+        } else {
+            System.out.print("Which item did you complete (1-" + todos.size() + ")? ");
+            String item = input.nextLine();
+            int num = Integer.parseInt(item);
+            completedTodos.add(todos.remove(num - 1));
+        }
+        return completedTodos;
+    }
+
+    // This method prompts the user for a file name then takes items/tasks from an
+    // ArrayList and save/print them in a file, listed in order, one by one. The 
+    // exception FileNotFoundException added since Java requires it for reading 
+    // from files
+    // Parameters: 
+    //  Scanner input -- used to prompt user for file name
+    //  List<String> todos - ArrayList to be printed onto file
+    // Returns: 
+    //  N/A
+    public static void saveItems(Scanner input, List<String> todos) throws FileNotFoundException {
+        System.out.print("File name? ");
+        String fileName = input.nextLine();
+        PrintStream output = new PrintStream(new File(fileName));
+        for (int i = 0; i < todos.size(); i++) {
+            String listItem = todos.get(i);
+            output.println(listItem);
+        }
+    }
+
+    // This method prompts user for an EXISTING file, which is then used to 
+    // update the arrayList of todos. The ArrayList's previous contents are 
+    // cleared prior to adding the file contents to it. If file does not exist,
+    // then a FileNotFoundException will be thrown. Exception also exists since 
+    // Java requires it for reading from files.
+    // Parameters: 
+    //  Scanner input -- used to prompt user for existing file
+    //  List<String> todos -- The ArrayList to be updated w/ file contents
+    // Returns: 
+    //  N/A
+    public static void loadItems(Scanner input, List<String> todos) throws FileNotFoundException {
+        System.out.print("File name? ");
+        String fileAccess = input.nextLine();
+        File newFile = new File(fileAccess);
+        Scanner fileScanner = new Scanner(newFile);
+        todos.clear();
+        while (fileScanner.hasNextLine()) {
+            String item = fileScanner.nextLine();
+            todos.add(item);
+        }
+    }
+
+    // This method takes an arrayList that stored completed todo items by user
+    // and depending on whether the list is empty (if empty, user is notified 
+    // they have nothing done) this method will print out, in a numbered list, 
+    // the completed todos. This method adds functionality of viewing completed
+    // items so that in case user forgets what's been marked completed, or in 
+    // case user marks something as complete accidentally. 
+    // Parameters:
+    //  List<String> completedTodos -- contains list of removed elements from arrayList 
+    //  that contained todo items previously. Removed items are stored in 
+    //  completedTODOS and printed here in a numbered list 
+    // Returns: 
+    //  N/A
+    public static void trueExtensionFlag (List<String> completedTodos) {
+        System.out.println("Here's todays COMPLETED TODOS: ");
+        if (completedTodos.isEmpty()) {
+            System.out.println("No to-do's done yet. Get to work! ");
+        } else {
+            for (int i = 0; i < completedTodos.size(); i++) {
+                String grabCompleted = completedTodos.get(i);
+                System.out.println("" + (i + 1) + ": " + grabCompleted);
+            }
+        }
+    }
+}
