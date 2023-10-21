@@ -1,0 +1,261 @@
+// Mohamed Aden
+// 10/07/2023
+// CSE 123
+// TA: Hawa Ali Drammeh
+// This class represents a Connect Four game. It creates a board to be played on
+// and allows users to make moves and drop pieces where they want on this board
+// and designates specified pieces for two players.
+import java.util.*;
+
+public class ConnectFour implements AbstractStrategyGame { 
+    private char[][] panel;
+    private boolean isRedTurn;
+
+    // Constructs connectFour board and initializes fields
+    // No returns, no exceptions, no parameters
+    public ConnectFour() {
+        panel = new char[][]{{'-', '-', '-', '-', '-', '-', '-'},
+                            {'-', '-', '-', '-', '-', '-', '-'},
+                            {'-', '-', '-', '-', '-', '-', '-'},
+                            {'-', '-', '-', '-', '-', '-', '-'},
+                            {'-', '-', '-', '-', '-', '-', '-'},
+                            {'-', '-', '-', '-', '-', '-', '-'}};
+        isRedTurn = true;
+    }
+
+    // Constructs and returns string on rules of game and how to play it.
+    // No parameters
+    // No exceptions
+    // Returns: 
+    //  String -- contains instructions on how to play this connectFour game and
+    //  rules for the game
+    public String instructions() {
+        String gameInstructions = "Welcome to ConnectFour!\n";
+        gameInstructions += "Here are the game instructions:\n";
+        gameInstructions += "The board has 6 rows and 7 columns.\n";
+        gameInstructions += "Player1 is assigned a 'red piece', represented by 'R' or 'r'.\n";
+        gameInstructions += "Player2 is assigned a 'yellow piece', represented by 'Y' or 'y'.\n";
+        gameInstructions += "You must choose one representation of the assigned piece!\n";
+        gameInstructions += "Either the uppercase or lowercase representation of the letter and ";
+        gameInstructions += "you must must stick with that for the remainder of the game.\n";
+        //gameInstructions += "For example, if player1 decides to use lowercase r as their piece";
+        //gameInstructions += "they must continue to use a lowercase r for the rest of the game";
+        //gameInstructions += "If player1 gets 4 pieces in a row, but they are inconsistent ";
+        //gameInstructions += "in terms of being exclusively either upper or lowercase, the game";
+        //gameInstructions += "will continue and that will not count as win.\n";
+        //gameInstructions += "Hence, for player1 to win, they must have a row of either all ";
+        //gameInstructions += "uppercase or all lowercase 'r' and the ";
+        //gameInstructions += "same logic applies for player2 when using 'y' or 'Y'.\n";
+        gameInstructions += "Player1 goes first, then player2. This repeats until ";
+        gameInstructions += "one player wins.\n";
+        gameInstructions += "To win, a player must have 4 of their pieces ";
+        gameInstructions += "in a row on the board.\n";
+        gameInstructions += "But don't forget, these pieces must be exclusively either ";
+        gameInstructions += "uppercase or lowercase otherwise the win won't count!\n";
+        gameInstructions += "Pieces can be lined up in 3 different fashions for ";
+        gameInstructions += "a win to occur:\n";
+        gameInstructions += "Vertically, horizontally, or diagonally.\n";
+        gameInstructions += "A live look at the present state of the board will be shown ";
+        gameInstructions += "everytime a player makes a move so that players can strategize";
+        gameInstructions += "possible next moves.\n";
+        gameInstructions += "May the best player win! Here's the board's current state, ";
+        gameInstructions += "which is empty:\n";
+        return gameInstructions;
+    }
+
+    // This method determines if game is over depending on if one of the players has
+    // won and returns true if player has won game, otherwise returns false. 
+    // No Exceptions
+    // No parameters
+    // Returns:
+    //  Boolean -- true if player has won, false if no winner has been determined.
+    public boolean isGameOver() {
+        return getWinner() >= 0;
+    }
+
+    // This method determines a winner, checking if there are 4 pieces in a row
+    // placed by one player either diagonally, vertically, or horizontally.
+    // Returns an int depending on which player wins, or if there is no win.
+    // No Exceptions
+    // No Parameters
+    // Returns: 
+    //  int -- returns '-1' if no winner has been determined yet, '1' if player1
+    //  wins, or '2' if player2 wins. 
+    public int getWinner() {
+        //checks rows
+        for (int i = 0; i < panel.length; i++) {
+            for (int j = 0; j <= panel[i].length - 4; j++) {    //runs to arr[0][3]
+                char piece = panel[i][j];
+                if (piece != '-' && piece == panel[i][j + 1] &&
+                piece == panel[i][j + 2] && piece == panel[i][j + 3]) {
+                    if (piece == 'R' || piece == 'r') {
+                        return 1;
+                    } else {
+                        return 2;
+                    }
+                }        
+            }
+        }
+        //checks columns
+        for (int col = 0; col < panel[0].length; col++) {
+            for (int row = 0; row <= panel.length - 4; row++) {  //run to arr[2][0]
+                char piece = panel[row][col];
+                if (piece != '-' && piece == panel[row + 1][col] &&
+                 piece == panel[row + 2][col] && piece == panel[row + 3][col]) {
+                    if (piece == 'R' || piece == 'r') {
+                        return 1;
+                    } else {
+                        return 2;
+                    }
+                }
+            }
+        }
+        // checks bottom left diagonals
+        for (int row = 5; row > 2; row--) {
+            for (int col = 0; col < 4; col++) {
+                char piece = panel[row][col];
+                if (piece != '-' && piece == panel[row - 1][col + 1]&& 
+                piece == panel[row - 2][col + 2] && piece == panel[row - 3][col + 3]) {
+                    if (piece == 'R' || piece == 'r') {
+                        return 1;
+                    } else { 
+                        return 2;
+                    }
+                }
+            }
+        }
+        // checks bottom right diagonals
+        for (int row = 5; row > 2; row--) {
+            for (int col = 6; col > 2; col--) {
+                char piece = panel[row][col];
+                if (piece != '-' && piece == panel[row - 1][col - 1]&& 
+                piece == panel[row - 2][col - 2] && piece == panel[row - 3][col - 3]) {
+                    if (piece == 'R' || piece == 'r') {
+                        return 1;
+                    } else { 
+                        return 2;
+                    }
+                }
+            }
+        }
+        // checks top left diagonals
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 4; col++) {
+                char piece = panel[row][col];
+                if (piece != '-' && piece == panel[row + 1][col + 1]&& 
+                piece == panel[row + 2][col + 2] && piece == panel[row + 3][col + 3]) {
+                    if (piece == 'R' || piece == 'r') {
+                        return 1;
+                    } else { 
+                        return 2;
+                    }
+                }
+            }
+        }
+        // checks top right diagonals
+        for (int row = 0; row < 3; row++) {
+            for (int col = 6; col > 2; col--) {
+                char piece = panel[row][col];
+                if (piece != '-' && piece == panel[row + 1][col - 1]&& 
+                piece == panel[row + 2][col - 2] && piece == panel[row + 3][col - 3]) {
+                    if (piece == 'R' || piece == 'r') {
+                        return 1;
+                    } else { 
+                        return 2;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    // Method determines who takes next turn. Returns int depending on whether
+    // game is over or which player's turn it is.
+    // No Exceptions
+    // No parameters
+    // Returns:
+    //   int -- '-1' if game is over, '1' if it's player1's turn & '2' if it's
+    //   player2's turn.
+    public int getNextPlayer() {
+        if (isGameOver()) {
+            return -1;
+        }
+        if (isRedTurn) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+    // Method prompts user for board positioning and piece ultimately allowing
+    // user to place piece on board.
+    // Parameters: 
+    //  Scanner -- used to prompt user for board positioning and piece to be placed
+    // Exceptions: 
+    //  IllegalArgumentException -- thrown in cases where player:
+        // Requested board positioning outside of board's bounds.
+        // Attempts to place a piece other than the designated pieces 'y,Y,r,r'.
+        // Attempts to take other players turn (i.e. player1's turn and player2
+        // attempts to take turn).
+        // Attempts to place piece in spot where there is nothing below to support
+        // it (does not throw if requested row is at bottom). 
+    // No returns
+    public void makeMove(Scanner scanner) {
+        scanner = new Scanner(System.in);
+        System.out.println("What row would you like to drop your piece in?: ");
+        int row = scanner.nextInt();
+        if (row > 5) {
+            throw new IllegalArgumentException("Invalid input: row must be in bounds " +
+                                                            "of Connect Four board");
+        }
+        //System.out.println();
+        System.out.println("What column would you like to drop your piece?: ");
+        int col = scanner.nextInt();
+        if (col > 6) {
+            throw new IllegalArgumentException("Invalid input: column must be in bounds of " +
+                                                                    "Connect Four board");
+        }
+        if (panel[row][col] != '-') {
+            throw new IllegalArgumentException("Uh-Oh! Space is occupied");
+        } else if (row != 5 && panel[row + 1][col] == '-') {
+            throw new IllegalArgumentException("Uh-Oh! Piece needs to be inserted " +
+                                    "into one or more rows down in desired column");
+        }
+        //System.out.println();
+        System.out.println("Enter piece you'd like to drop('r'/'R' or 'y'/'Y'): ");
+        String stringPiece = scanner.next();
+        char piece = stringPiece.charAt(0);
+        if (!(piece == 'r' || piece == 'R' || piece == 'y' || piece == 'Y')) {
+            throw new IllegalArgumentException("Use either 'r' or 'R' if it's player1's " +
+                            "turn and if it's player2's turn use either 'y' or 'Y'");
+        }
+        if (isRedTurn && (piece == 'y' || piece == 'Y')) {
+            throw new IllegalArgumentException("Not your turn!");
+        } else if (!isRedTurn && (piece == 'r' || piece == 'R')) {
+            throw new IllegalArgumentException("Not your turn!");
+        }
+        panel[row][col] = piece;
+        if (isRedTurn) {
+            isRedTurn = !isRedTurn;
+        } else {
+            isRedTurn = true;
+        }
+    }
+
+    // Constructs and returns string repesenting current state of the
+    // board as it progresses.
+    // No Parameters
+    // No exceptions
+    // Returns:
+    //  String - a string representation of the game board
+    public String toString() {
+        String currentState = "";
+        for (int row = 0; row < panel.length; row++) {
+            for (int col = 0; col < panel[row].length; col++) {
+                currentState += panel[row][col];
+            }
+            currentState += "\n";
+        }
+        return currentState; 
+    }
+}
