@@ -1,0 +1,114 @@
+// Mohamed Aden
+// CSE 123
+// September 30th, 2023
+// TA: Hawa Ali Drammeh
+// The Book class implements the Media class and allows the Client to create a Book
+// object as well as get information about the book such as ratings, the number
+// of ratings, the book name and authors(provided by client). Client can also add ratings
+// for this Book object if desired.
+import java.util.*;
+
+public class Book implements Media{
+    //fields
+    //constructors
+    //instance methods
+    private String title;
+    private String author;
+    private List<Integer> ratings;
+    private List<String> authors;
+
+    // Constructs a new Book object given a book Title and an author name
+    // Parameters
+    //  String title -- The title of the Book object to be constructed
+    //  String author -- The author of (title)/the Book object.
+    public Book(String title, String author) {
+        this.title = title;
+        this.author = author;
+        this.authors = new ArrayList<>();
+        this.ratings = new ArrayList<>();
+        authors.add(author);
+    }
+
+    // Constructs a new Book object given a book title and a list of authors
+    // Parameters
+    //  String title -- The title of the Book object to be constructed
+    //  List<String> authors  -- The authors of (title)/the Book object.
+    public Book(String title, List<String> authors) {
+        this.title = title;
+        this.authors = authors;
+        this.ratings = new ArrayList<>();
+    }
+
+    // This method gets the title of this Book
+    // No Exceptions
+    // Parameters:
+    //  N/A
+    // Returns:
+    //  String title -- the title of this book
+    public String getTitle() {
+        return title;
+    }
+
+    // This method gets the authors of this book
+    // No Exceptions
+    // Parameters:
+    //  N/A
+    // Returns:
+    //  List<String> authors -- the list of authors of this book 
+    public List<String> getArtists() {
+        return authors;
+    }
+
+    // This method adds a rating for this book
+    // Parameters:
+    //  int score -- the rating to be added
+    // No Exceptions
+    // No Returns
+    public void addRating(int score) {
+        ratings.add(score);
+    }
+
+    // Gets the number of ratings for this book
+    // No Exceptions
+    // No Parameters
+    // Returns:
+    //  int ratings.size() -- the # if ratings in ratings list.  
+    public int getNumRatings() {
+        return ratings.size();
+    }
+    // Getter method(GM)
+    // Gets the average rating of this book
+    // No Exceptions
+    // No Parameters
+    // Returns: 
+    //  int realAverage -- the average of all the ratings in ratings list.
+    public double getAverageRating() {
+        if (ratings.isEmpty()) {
+            return 0.0;
+        }
+        double sum = 0.0;
+        for (int i = 0; i < ratings.size(); i++) {
+            int currentRate = ratings.get(i);
+            sum += currentRate;
+        } 
+        double realAverage = sum / ratings.size();
+        return realAverage;
+    }
+
+    // This method returns a String representation of the book title, the book's
+    // author/authors, the average rating and the # of ratings averaged.
+    // No Exceptions
+    // No Parameters
+    // Returns:
+    //  String -- String representation of the book title, the book's author/authors,
+    //  the average rating and the # of ratings averaged.
+    public String toString() {
+        double roundedAverage = Math.round(this.getAverageRating() * 100.0) / 100.0;
+        if (ratings.size() == 0) {
+            return "" + this.title + " by " + this.authors + ": No ratings yet!";
+        } else {
+            return "" + this.title + " by " + this.authors + ": " + roundedAverage +
+             " (" + this.getNumRatings() + " ratings)"; 
+        }
+    }
+}
